@@ -3,7 +3,7 @@ import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import GPTRequestSerializer
+from answers.serializers import GPTRequestSerializer
 
 class GPTAPIView(APIView):
     def post(self, request):
@@ -15,7 +15,7 @@ class GPTAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_gpt_response(self, prompt):
-        api_key = os.getenv('OPENAI_API_KEY')  # Access the API key from environment
+        api_key = os.getenv('OPENAI_API_KEY')
         headers = {
             'Authorization': f'Bearer {api_key}',
             'Content-Type': 'application/json',
