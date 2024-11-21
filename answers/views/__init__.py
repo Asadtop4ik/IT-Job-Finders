@@ -1,2 +1,2 @@
-from .gpt import GPTAPIView
+from .gpt import GPTView
 

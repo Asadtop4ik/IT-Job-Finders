@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import GPTAPIView
+from .views import GPTView
 
 urlpatterns = [
-    path('gpt/', GPTAPIView.as_view(), name='gpt-api'),
+    path('gpt/', GPTView.as_view(), name='gpt-api'),
 ]

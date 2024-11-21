@@ -53,11 +53,10 @@ INSTALLED_APPS = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_REPLACE_HTTPS_REFERER = True
+# CORS_REPLACE_HTTPS_REFERER = True
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -184,3 +183,5 @@ SPECTACULAR_SETTINGS = {
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+OPENAI_API_KEY = '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'
