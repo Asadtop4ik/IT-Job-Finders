@@ -25,3 +25,5 @@
 #         )
 #         result = gpt_response['choices'][0]['message']['content']
 #         return Response({"result": result})
+
+
