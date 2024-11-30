@@ -1,39 +1,43 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model, authenticate
+from .models import User
+from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 
-User = get_user_model()
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'phone', 'name', 'role', 'is_active', 'is_staff', 'is_superuser', 'createdAt', 'updatedAt')
+        fields = ('id', 'email', 'first_name', 'last_name', 'birth_date', 'is_active', 'is_staff', 'is_superuser', 'createdAt', 'updatedAt')
+        read_only_fields = ('id', 'createdAt', 'updatedAt')
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ('id','phone', 'name', 'password', 'role')
+        fields = ('id', 'email', 'first_name', 'last_name', 'birth_date', 'password')
 
     def create(self, validated_data):
         user = User.objects.create_user(
-            phone=validated_data['phone'],
+            email=validated_data['email'],
             password=validated_data['password'],
-            name=validated_data.get('name', ''),
-            role=validated_data.get('role', 'customer'),
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            birth_date=validated_data.get('birth_date'),
         )
         return user
 
+
 class CustomTokenObtainPairSerializer(serializers.Serializer):
-    phone = serializers.CharField()
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        phone = attrs.get('phone')
+        email = attrs.get('email')
         password = attrs.get('password')
-        user = authenticate(phone=phone, password=password)
 
+        user = authenticate(username=email, password=password)
         if user is None:
             raise serializers.ValidationError('Invalid credentials')
 
@@ -43,9 +47,3 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
             'access': str(refresh.access_token),
             'user_data': CustomUserSerializer(user).data
         }
-
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'phone', 'name', 'role', 'is_active', 'is_staff', 'createdAt', 'updatedAt', 'is_superuser']
-        read_only_fields = ['id']

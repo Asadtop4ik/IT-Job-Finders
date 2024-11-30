@@ -9,14 +9,14 @@ class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     ordering = ['-createdAt']
-    list_display = ('phone', 'name', 'role', 'is_active', 'is_staff', 'is_superuser')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'role')
-    search_fields = ('phone', 'name', 'role')
+    list_display = ('email', 'first_name', 'last_name', 'birth_date', 'is_active', 'is_staff', 'is_superuser')
+    list_filter = ('is_staff', 'is_superuser', 'is_active')
+    search_fields = ('email', 'first_name', 'last_name')
     readonly_fields = ('createdAt', 'updatedAt')
 
     fieldsets = (
-        (None, {'fields': ('phone', 'password')}),
-        ('Personal info', {'fields': ('name', 'role')}),
+        (None, {'fields': ('email', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'birth_date')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
         ('Important dates', {'fields': ('createdAt', 'updatedAt')}),
     )
@@ -24,7 +24,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('phone', 'name', 'password1', 'password2', 'role', 'is_staff', 'is_superuser', 'is_active')}
+            'fields': ('email', 'first_name', 'last_name', 'birth_date', 'password1', 'password2', 'is_staff', 'is_superuser', 'is_active')}
          ),
     )
 
@@ -34,5 +34,4 @@ class UserAdmin(BaseUserAdmin):
         super().save_model(request, obj, form, change)
 
 
-# Register the UserAdmin
 admin.site.register(User, UserAdmin)
