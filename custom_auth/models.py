@@ -1,52 +1,36 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
-from django.core.validators import RegexValidator
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, phone, password=None, **extra_fields):
-        if not phone:
-            raise ValueError('The Phone field is required')
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field is required')
 
-        # Format the phone number
-        formatted_phone = self.format_phone_number(phone)
-
-        user = self.model(phone=formatted_phone, **extra_fields)
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, phone, password=None, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(phone, password, **extra_fields)
 
-    def format_phone_number(self, phone):
-        # Remove any non-digit characters
-        digits = ''.join(filter(str.isdigit, phone))
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
 
-        # Ensure the number starts with +998
-        if not digits.startswith('998'):
-            digits = '998' + digits
-
-        # Format the number
-        return f"+{digits[:3]} {digits[3:5]} {digits[5:8]}-{digits[8:10]}-{digits[10:]}"
+        return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    ROLE_CHOICES = [
-        ('customer', 'Customer'),
-        ('restaurant_owner', 'Restaurant Owner'),
-        ('admin', 'Admin'),
-    ]
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    birth_date = models.DateField(null=True, blank=True)
+    email = models.EmailField(unique=True)
 
-    phone_regex = RegexValidator(
-        regex=r'^\+998 \d{2} \d{3}-\d{2}-\d{2}$',
-        message="Phone number must be entered in the format: '+998 XX XXX-XX-XX'."
-    )
-    phone = models.CharField(validators=[phone_regex], max_length=19, unique=True)
-    name = models.CharField(max_length=255)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -56,13 +40,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'phone'
-    REQUIRED_FIELDS = ['name']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'birth_date']
 
     def __str__(self):
-        return self.phone
-
-    def save(self, *args, **kwargs):
-        # Format the phone number before saving
-        self.phone = UserManager.format_phone_number(self, self.phone)
-        super().save(*args, **kwargs)
+        return self.email

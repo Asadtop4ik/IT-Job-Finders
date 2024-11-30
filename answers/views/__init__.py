@@ -1,2 +1,2 @@
-from .gpt import GPTView
+from .questions import QuestionViewSet, AnswerViewSet
 

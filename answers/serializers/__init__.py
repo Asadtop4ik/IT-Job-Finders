@@ -1,1 +1,1 @@
-from .gpt import GPTRequestSerializer
+from .questions import QuestionSerializer, AnswerSerializer
