@@ -13,7 +13,7 @@ def homeView(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('custom_auth.urls')),
-    # path('products/', include('answers.urls')),
+    path('products/', include('answers.urls')),
     path('', homeView),
 
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -1,8 +1,13 @@
 from rest_framework.routers import DefaultRouter
-from .views import QuestionViewSet, AnswerViewSet
+from .views import QuestionViewSet, AnswerViewSet, GeminiChatbotView
+from django.urls import path
 
 router = DefaultRouter()
-router.register('questions', QuestionViewSet, basename='questions')  # Endpoint for questions
-router.register('answers', AnswerViewSet, basename='answers')  # Endpoint for answers
+router.register('questions', QuestionViewSet, basename='questions')
+router.register('answers', AnswerViewSet, basename='answers')
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('gemini-chat/', GeminiChatbotView.as_view(), name='gemini-chat'),
+
+] + router.urls
+

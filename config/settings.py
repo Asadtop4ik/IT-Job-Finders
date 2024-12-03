@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = 'custom_auth.User'
-
+GEMINI_API_KEY='AIzaSyA7Uu3ZXbBPbzM1eDUmoGx0-ek14xsllAc'
 # Application definition
 
 INSTALLED_APPS = [

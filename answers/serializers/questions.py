@@ -13,3 +13,13 @@ class AnswerSerializer(serializers.ModelSerializer):
         model = Answer
         fields = ['id', 'user', 'question', 'selected_option', 'timestamp']
         read_only_fields = ['user', 'timestamp']  # User will be set automatically from the request
+
+
+
+
+class GeminiChatbotSerializer(serializers.Serializer):
+    prompt = serializers.CharField(
+        required=True,
+        max_length=500,
+        help_text="The user prompt for the chatbot."
+    )
