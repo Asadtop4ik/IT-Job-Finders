@@ -12,8 +12,7 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ['id', 'user', 'question', 'selected_option', 'timestamp']
-        read_only_fields = ['user', 'timestamp']  # User will be set automatically from the request
-
+        read_only_fields = ['user', 'timestamp']  # User will be set automatically
 
 
 

@@ -40,26 +40,8 @@ class AnswerViewSet(viewsets.ModelViewSet):
         """
         return Answer.objects.filter(user=self.request.user)
 
-    def create(self, request, *args, **kwargs):
+    def perform_create(self, serializer):
         """
-        Save the user's answer to a question.
-        Prevent duplicate answers for the same question.
+        Automatically associate the logged-in user with the answer
         """
-        question_id = request.data.get('question')
-        selected_option = request.data.get('selected_option')
-
-        # Check if the user has already answered this question
-        if Answer.objects.filter(user=request.user, question_id=question_id).exists():
-            return Response(
-                {"error": "You have already answered this question."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Validate and save the answer
-        data = request.data.copy()
-        data['user'] = request.user.id  # Set the authenticated user
-
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer.save(user=self.request.user)  # Assign the authenticated user to the answer

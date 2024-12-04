@@ -13,7 +13,7 @@ class GeminiChatbotView(APIView):
     @extend_schema(
         summary="Generate a response using Google's Gemini API",
         description="This endpoint takes a user prompt and generates a response using the Google Generative AI Gemini model.",
-        request=GeminiChatbotSerializer,  # Use the serializer for the request schema
+        request=GeminiChatbotSerializer,
         responses={
             200: {
                 "type": "object",
