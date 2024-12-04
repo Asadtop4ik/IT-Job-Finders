@@ -5,7 +5,7 @@ from drf_spectacular.utils import extend_schema
 from answers.serializers import GeminiChatbotSerializer
 import google.generativeai as genai
 
-# Configure the API key for Google Generative AI
+
 genai.configure(api_key='AIzaSyA7Uu3ZXbBPbzM1eDUmoGx0-ek14xsllAc')
 
 

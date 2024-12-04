@@ -1,1 +1,1 @@
-from .questions import QuestionSerializer, AnswerSerializer, GeminiChatbotSerializer
+from .questions import QuestionSerializer, AnswerSerializer, GeminiChatbotSerializer, BulkAnswerSerializer

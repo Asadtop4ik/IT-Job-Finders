@@ -12,7 +12,19 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ['id', 'user', 'question', 'selected_option', 'timestamp']
-        read_only_fields = ['user', 'timestamp']  # User will be set automatically
+        read_only_fields = ['user', 'timestamp']
+
+
+class SingleAnswerSerializer(serializers.Serializer):
+    question = serializers.IntegerField()
+    selected_option = serializers.CharField(max_length=1)
+
+class BulkAnswerSerializer(serializers.Serializer):
+    answers = serializers.ListField(
+        child=SingleAnswerSerializer(),
+        help_text="A list of answers with question IDs and selected options."
+    )
+
 
 
 
