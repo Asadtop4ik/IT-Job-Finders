@@ -11,8 +11,9 @@ class QuestionSerializer(serializers.ModelSerializer):
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        fields = ['id', 'user', 'question', 'selected_option', 'timestamp']
-        read_only_fields = ['user', 'timestamp']
+        fields = ['id', 'user', 'question', 'selected_option', 'timestamp', 'gemini_response']
+        read_only_fields = ['user', 'timestamp', 'gemini_response']
+
 
 
 class SingleAnswerSerializer(serializers.Serializer):

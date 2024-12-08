@@ -20,6 +20,8 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)  # Link to the question
     selected_option = models.CharField(max_length=1, choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')])  # User's selected answer
     timestamp = models.DateTimeField(auto_now_add=True)  # When the answer was submitted
+    gemini_response = models.TextField(null=True, blank=True)  # Store the Gemini API response
 
     def __str__(self):
         return f"User: {self.user}, Question: {self.question}, Answer: {self.selected_option}"
+

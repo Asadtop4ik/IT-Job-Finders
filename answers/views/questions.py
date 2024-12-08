@@ -98,6 +98,11 @@ class AnswerViewSet(viewsets.ModelViewSet):
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content(prompt)
             chatbot_response = response.text
+
+            # Save the Gemini response to each answer
+            for answer in saved_answers:
+                answer.gemini_response = chatbot_response
+                answer.save()
         except Exception as e:
             chatbot_response = f"Error generating chatbot response: {str(e)}"
 
