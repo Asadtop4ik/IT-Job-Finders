@@ -60,16 +60,16 @@ class AnswerViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # Extract answers from the request
+
         answers_data = serializer.validated_data['answers']
 
-        # Save each answer to the database
+
         saved_answers = []
         for answer_data in answers_data:
             question_id = answer_data['question']
             selected_option = answer_data['selected_option']
 
-            # Fetch the question object
+
             try:
                 question = Question.objects.get(id=question_id)
             except Question.DoesNotExist:
@@ -78,7 +78,7 @@ class AnswerViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # Save the answer
+
             answer = Answer.objects.create(
                 user=request.user,
                 question=question,
@@ -86,7 +86,7 @@ class AnswerViewSet(viewsets.ModelViewSet):
             )
             saved_answers.append(answer)
 
-        # Create a prompt for the chatbot using all the answers
+
         prompt = "Here are the user's answers:\n"
         for answer in saved_answers:
             prompt += f"Question: {answer.question.text}\nAnswer: {answer.selected_option}\n"
@@ -94,19 +94,19 @@ class AnswerViewSet(viewsets.ModelViewSet):
         prompt += "\nBased on these answers, what profession or career path would you recommend for the user?"
 
         try:
-            # Generate a single response from the Gemini API
+
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content(prompt)
             chatbot_response = response.text
 
-            # Save the Gemini response to each answer
+
             for answer in saved_answers:
                 answer.gemini_response = chatbot_response
                 answer.save()
         except Exception as e:
             chatbot_response = f"Error generating chatbot response: {str(e)}"
 
-        # Return the saved answers and the chatbot's response
+
         return Response(
             {
                 "saved_answers": AnswerSerializer(saved_answers, many=True).data,

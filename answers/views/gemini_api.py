@@ -37,24 +37,23 @@ class GeminiChatbotView(APIView):
         },
     )
     def post(self, request):
-        # Validate the request body using the serializer
         serializer = GeminiChatbotSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Extract the validated prompt
+
         user_prompt = serializer.validated_data['prompt']
 
         try:
-            # Initialize the Gemini model
+
             model = genai.GenerativeModel("gemini-1.5-flash")
 
-            # Generate content using the Gemini model
+
             response = model.generate_content(user_prompt)
 
-            # Return the generated response
+
             return Response({"prompt": user_prompt, "response": response.text}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            # Handle any errors (e.g., invalid API key, network issues, etc.)
+
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
