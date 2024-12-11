@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from answers.models import Question, Answer
+from answers.models import Question, Answer, Contact
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -35,3 +35,9 @@ class GeminiChatbotSerializer(serializers.Serializer):
         max_length=500,
         help_text="The user prompt for the chatbot."
     )
+
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields = '__all__'
+

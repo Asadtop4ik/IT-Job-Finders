@@ -25,3 +25,10 @@ class Answer(models.Model):
     def __str__(self):
         return f"User: {self.user}, Question: {self.question}, Answer: {self.selected_option}"
 
+class Contact(models.Model):
+    name = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20)
+    message = models.TextField()
+
+    def __str__(self):
+        return self.name

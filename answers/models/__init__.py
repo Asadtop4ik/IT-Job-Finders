@@ -1,1 +1,2 @@
-from .questions import Answer, Question
+from .questions import Answer, Question, Contact
+
