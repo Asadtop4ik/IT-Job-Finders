@@ -3,7 +3,7 @@ from answers.models import SmallWin
 from answers.serializers import SmallWinSerializer
 from django.utils import timezone
 from datetime import timedelta
-
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 class SmallWinViewSet(viewsets.ModelViewSet):
     queryset = SmallWin.objects.all()
     serializer_class = SmallWinSerializer
@@ -28,6 +28,12 @@ class SmallWinViewSet(viewsets.ModelViewSet):
 
         return SmallWin.objects.filter(user=user, date_created__gte=start_date)
 
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='period', description='Filter by period (week, month, year)', required=False, type=str),
+        ]
+    )
     def list(self, request, *args, **kwargs):
         period = request.query_params.get('period')
         if period:
