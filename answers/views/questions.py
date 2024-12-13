@@ -29,6 +29,14 @@ class QuestionViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination  # Add pagination
 
 
+# Define a dictionary to map question IDs and options to profession scores
+PROFESSION_SCORES = {
+    # Example structure: {question_id: {option: {profession: score}}}
+    1: {"A": {"Frontend": 2}, "B": {"Backend": 2}, "C": {"Q/A": 1}, "D": {"DevOps": 3}},
+    2: {"A": {"PM": 3}, "B": {"Q/A": 1}, "C": {"Frontend": 1}, "D": {"Backend": 1}},
+    # Add mappings for all your questions
+}
+
 class AnswerViewSet(viewsets.ModelViewSet):
     serializer_class = AnswerSerializer
     permission_classes = [IsAuthenticated]  # Only authenticated users can answer questions
@@ -47,6 +55,7 @@ class AnswerViewSet(viewsets.ModelViewSet):
 
         answers_data = serializer.validated_data['answers']
         saved_answers = []
+        profession_scores = {"Frontend": 0, "Backend": 0, "Q/A": 0, "DevOps": 0, "PM": 0}  # Initialize scores
 
         for answer_data in answers_data:
             question_id = answer_data['question']
@@ -68,40 +77,48 @@ class AnswerViewSet(viewsets.ModelViewSet):
             )
             saved_answers.append(answer)
 
-        # Build the prompt for the Gemini API
-        prompt = "Here are the user's answers:\n"
-        for answer in saved_answers:
-            prompt += f"Question: {answer.question.text}\n"
-            prompt += f"Options: A) {answer.question.option_a}, B) {answer.question.option_b}, C) {answer.question.option_c}, D) {answer.question.option_d}\n"
-            prompt += f"Answer: {answer.selected_option}\n"
+            # Update profession scores based on the selected option
+            if question_id in PROFESSION_SCORES and selected_option in PROFESSION_SCORES[question_id]:
+                for profession, score in PROFESSION_SCORES[question_id][selected_option].items():
+                    profession_scores[profession] += score
 
-        prompt += "\nBased on these answers, what profession or career path would you recommend for the user?"
+        # Determine the profession with the highest score
+        best_profession = max(profession_scores, key=profession_scores.get)
+
+        # Build the prompt for the Gemini API
+        prompt = f"The user aligns well with a career in {best_profession}. Could you share tailored advice, \
+        growth opportunities, or skills to focus on for excelling in this field? and make a short summary."
 
         try:
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content(prompt)
-            chatbot_response = response.text
+            gemini_response = response.text
 
+            # Save the gemini_response to each answer
             for answer in saved_answers:
-                answer.gemini_response = chatbot_response
+                answer.gemini_response = gemini_response
                 answer.save()
         except Exception as e:
-            chatbot_response = f"Error generating chatbot response: {str(e)}"
+            gemini_response = f"Error generating chatbot response: {str(e)}"
             import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Gemini API error: {str(e)}")
 
-        created_count = len(
-            [answer for answer in saved_answers if answer.timestamp == answer.timestamp])  # Count new answers
-        updated_count = len(saved_answers) - created_count
+        # Assume all answers have the same timestamp for simplicity
+        if saved_answers:
+            timestamp = saved_answers[0].timestamp
+        else:
+            timestamp = None
 
         return Response(
             {
-                "created_answers": created_count,
-                "updated_answers": updated_count,
-                "saved_answers": AnswerSerializer(saved_answers, many=True).data
+                "saved_answer": {
+                    "id": saved_answers[0].id if saved_answers else None,
+                    "user": request.user.id,
+                    "timestamp": timestamp,
+                    "gemini_response": gemini_response,
+                    "best_profession": best_profession  # The best suitable profession
+                }
             },
             status=status.HTTP_201_CREATED
         )
-
-
