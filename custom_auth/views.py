@@ -1,10 +1,11 @@
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from .models import User
-from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, CustomUserSerializer
-from rest_framework import viewsets
+from rest_framework.views import APIView
 
+from .models import User
+from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, CustomUserSerializer, SetNewPasswordSerializer
+from rest_framework import viewsets
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
@@ -34,3 +35,10 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
 
+class SetNewPasswordView(APIView):
+    def post(self, request):
+        serializer = SetNewPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"detail": "Password has been updated successfully."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

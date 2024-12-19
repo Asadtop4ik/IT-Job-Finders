@@ -47,3 +47,24 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
             'access': str(refresh.access_token),
             'user_data': CustomUserSerializer(user).data
         }
+
+
+
+class SetNewPasswordSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()  # User ID or any identifier you use
+    new_password = serializers.CharField(write_only=True)
+
+    def validate_user_id(self, value):
+        try:
+            user = User.objects.get(pk=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User does not exist.")
+        return value
+
+    def save(self):
+        user_id = self.validated_data['user_id']
+        new_password = self.validated_data['new_password']
+
+        user = User.objects.get(pk=user_id)
+        user.set_password(new_password)
+        user.save()
