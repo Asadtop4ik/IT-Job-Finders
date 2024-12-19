@@ -3,7 +3,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from .models import User
 from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, CustomUserSerializer
-
+from rest_framework import viewsets
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -28,3 +28,9 @@ class ProfileUserView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = User.objects.all()
+    serializer_class = CustomUserSerializer
+
