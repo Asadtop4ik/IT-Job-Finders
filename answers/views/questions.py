@@ -14,10 +14,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 
 
 class CustomPagination(PageNumberPagination):
-    """
-    Custom pagination for large datasets
-    """
-    page_size = 10  # Number of items per page
+    page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
 
@@ -29,7 +26,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination  # Add pagination
 
 
-# Define a dictionary to map question IDs and options to profession scores
+
 PROFESSION_SCORES = {
     # Example structure: {question_id: {option: {profession: score}}}
     1: {"A": {"Frontend": 2}, "B": {"Backend": 2}, "C": {"Q/A": 1}, "D": {"DevOps": 3}},
@@ -69,7 +66,7 @@ class AnswerViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # Use update_or_create to prevent duplicates
+
             answer, created = Answer.objects.update_or_create(
                 user=request.user,
                 question=question,
@@ -77,15 +74,15 @@ class AnswerViewSet(viewsets.ModelViewSet):
             )
             saved_answers.append(answer)
 
-            # Update profession scores based on the selected option
+
             if question_id in PROFESSION_SCORES and selected_option in PROFESSION_SCORES[question_id]:
                 for profession, score in PROFESSION_SCORES[question_id][selected_option].items():
                     profession_scores[profession] += score
 
-        # Determine the profession with the highest score
+
         best_profession = max(profession_scores, key=profession_scores.get)
 
-        # Build the prompt for the Gemini API
+
         prompt = f"The user aligns well with a career in {best_profession}. Could you share tailored advice, \
         growth opportunities, or skills to focus on for excelling in this field? and make a short summary."
 
@@ -104,7 +101,7 @@ class AnswerViewSet(viewsets.ModelViewSet):
             logger = logging.getLogger(__name__)
             logger.error(f"Gemini API error: {str(e)}")
 
-        # Assume all answers have the same timestamp for simplicity
+
         if saved_answers:
             timestamp = saved_answers[0].timestamp
         else:
@@ -117,7 +114,7 @@ class AnswerViewSet(viewsets.ModelViewSet):
                     "user": request.user.id,
                     "timestamp": timestamp,
                     "gemini_response": gemini_response,
-                    "best_profession": best_profession  # The best suitable profession
+                    "best_profession": best_profession
                 }
             },
             status=status.HTTP_201_CREATED
